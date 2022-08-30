@@ -224,7 +224,9 @@ class Lexer:
         # Map for escape characters
         escape_char = {
             'n': '\n',
-            't': '\t'
+            't': '\t',
+            '"': '"',
+            '\\': '\\'
         }
 
         while self.current_char != quote_char:

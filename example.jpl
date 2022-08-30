@@ -1,0 +1,21 @@
+//This is an example of Spearmint source code
+
+
+var i: 4
+var j: 10
+
+print(i+j)
+var x: 16
+
+fun read(x, y) {
+    var i: 77
+    print(40)
+    return 10
+}
+
+
+print(read(0,0))
+print(x)
+print(i)
+
+//list: [1, 2, 3]

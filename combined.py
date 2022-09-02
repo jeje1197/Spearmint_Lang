@@ -63,9 +63,8 @@ class Error:
 
         return f'\t{line_text}\n\t{arrow_str}\n'
 
-
     def __str__(self) -> str:
-        error_str = f'\n{self.message}\n\n'
+        error_str = f'{self.message}\n\n'
         error_str += self.get_text_with_arrow()
         error_str += f'{self.position}\n'
 
@@ -140,7 +139,7 @@ class Token:
     # Token Types
     FLOAT    = "float"
     INT      = "int"
-    VOID        = "void"
+    VOID     = "void"
     IDENTIFIER = "identifier"
     KEYWORD  = "KEYWORD"
     STRING   = "string"
@@ -1971,7 +1970,7 @@ class Interpreter:
         self.should_continue = True
 
 
-def run(file_name, input_text, compile=False):
+def run(file_name, input_text, compile=False) -> str:
 
     # Lexer
     lexer = Lexer(file_name, input_text)
@@ -1979,7 +1978,7 @@ def run(file_name, input_text, compile=False):
 
     if error: 
         print(error)
-        return error
+        return str(error)
     # else: 
     #     print(f'List of Tokens: {token_list}')
 
@@ -1990,7 +1989,7 @@ def run(file_name, input_text, compile=False):
 
     if error: 
         print(error)
-        return error
+        return str(error)
     else:
         print(f'----- Statements: {len(statement_list)} -----')
         for statement in statement_list:
@@ -2013,7 +2012,7 @@ def run(file_name, input_text, compile=False):
 
     if interpreter.error:
         print(interpreter.error)
-        return interpreter.error
+        return str(interpreter.error)
     else:
         return interpreter.output
 

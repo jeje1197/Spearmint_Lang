@@ -23,7 +23,7 @@ class Error:
 
 
     def __str__(self) -> str:
-        error_str = f'\n{self.message}\n\n'
+        error_str = f'{self.message}\n\n'
         error_str += self.get_text_with_arrow()
         error_str += f'{self.position}\n'
 

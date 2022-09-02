@@ -121,7 +121,7 @@ class FunctionDefNode:
         self.statement_list = statement_list
 
         self.start_pos = start_pos
-        self.end_pos = self.statement_list[len(statement_list)-1].end_pos
+        self.end_pos = self.statement_list[len(statement_list)-1].end_pos if self.statement_list else self.start_pos
 
     def __repr__(self):
         return f'FunctionDef: {self.name_token.value}({self.arg_names}) do {self.statement_list}'
@@ -185,14 +185,12 @@ class ClassAccessNode:
     def __repr__(self):
         return f"(ClassAccess: {self.class_name_token.value}.{self.property_token.value})"
 
-class TypeCastNode:
-    def __init__(self, type_name_token) -> None:
-        self.type_name_token = type_name_token
+# class TypeCastNode:
+#     def __init__(self, type_name_token) -> None:
+#         self.type_name_token = type_name_token
 
-        self.start_pos = self.type_name_token.start_pos
-        self.end_pos = self.type_name_token.end_pos
+#         self.start_pos = self.type_name_token.start_pos
+#         self.end_pos = self.type_name_token.end_pos
     
-    def __repr__(self):
-        return f"(TypeCast: {self.type_name_token.value})"
-
-
+#     def __repr__(self):
+#         return f"(TypeCast: {self.type_name_token.value})"

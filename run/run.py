@@ -8,7 +8,7 @@ from lexer.Lexer import Lexer
 from parser.Parser import Parser
 
 
-def run(file_name, input_text, transpile:bool) -> None:
+def run(file_name, input_text, compile=False) -> str:
 
     # Lexer
     lexer = Lexer(file_name, input_text)
@@ -16,7 +16,7 @@ def run(file_name, input_text, transpile:bool) -> None:
 
     if error: 
         print(error)
-        return error
+        return str(error)
     # else: 
     #     print(f'List of Tokens: {token_list}')
 
@@ -27,7 +27,7 @@ def run(file_name, input_text, transpile:bool) -> None:
 
     if error: 
         print(error)
-        return error
+        return str(error)
     else:
         print(f'----- Statements: {len(statement_list)} -----')
         for statement in statement_list:
@@ -43,14 +43,18 @@ def run(file_name, input_text, transpile:bool) -> None:
     global_context = Context(file_name)
     global_context.set_symbol_table(global_symbol_table)
 
-    #     #Interpreter
+    #Interpreter
     interpreter = Interpreter(global_context)
     interpreter.add_BuiltInFunctions()
-    interpreter.visit(statement_list, global_context)
+    try:
+        interpreter.visit(statement_list, global_context)
+    except Exception as e:
+        print(e)
+        return str(e)
 
     if interpreter.error:
         print(interpreter.error)
-        return interpreter.error
+        return str(interpreter.error)
     else:
         return interpreter.output
 
@@ -61,7 +65,7 @@ def run_from_file(file_name, transpile):
     file = open(file_name)
     file_text = file.read()
     file.close()
-    
+
     # Pass in file text as input
     run(file_name, file_text, transpile)
 

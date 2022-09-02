@@ -194,7 +194,8 @@ class Interpreter:
     def visit_FunctionDefNode(self, node, context):
         function_name = node.name_token.value
         if self.function_symbol_table.get(function_name):
-            return RTError(f'function {function_name} is already defined', node.start_pos, context)
+            self.error = RTError(f"Function '{function_name}' is already defined", node.start_pos, context)
+            return
 
         self.function_symbol_table.set(function_name, Function(function_name, node.arg_names, node.statement_list))
 
@@ -203,7 +204,8 @@ class Interpreter:
         function_name = node.name_token.value
         function = self.function_symbol_table.get(function_name)
         if not function:
-            return RTError(f'function {function_name} is not defined', node.name_token.start_pos)
+            self.error = RTError(f"Function '{function_name}' is not defined", node.name_token.start_pos)
+            return
 
         # Check for same number of args as defined in function
         function.check_args(node.args)

@@ -230,10 +230,10 @@ class Function:
 
         if num_args_passed < num_args_in_def:
             raise Exception(
-                f'function {self.name} is missing {num_args_in_def - num_args_passed} argument{"s" if num_args_in_def - num_args_passed > 1 else ""}'
+                f'Function {self.name} is missing {num_args_in_def - num_args_passed} argument{"s" if num_args_in_def - num_args_passed > 1 else ""}'
                 )
         elif num_args_passed > num_args_in_def:
-            raise Exception(f'function {self.name} has {num_args_passed - num_args_in_def} too many arguments')
+            raise Exception(f'Function {self.name} has {num_args_passed - num_args_in_def} too many arguments')
         return True
 
     def execute(self):

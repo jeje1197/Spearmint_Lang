@@ -231,7 +231,7 @@ class Lexer:
 
         while self.current_char != quote_char:
             if self.current_char == None:
-                return Error(f"InvalidSyntaxError: Missing {quote_char}", start_pos)
+                return Error(f"InvalidSyntaxError: Missing '{quote_char}'", start_pos)
 
             # Check for escape characters:
             # a '\' followed by 'n' or 't' and append

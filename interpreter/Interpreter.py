@@ -151,15 +151,11 @@ class Interpreter:
 
             if condition_value.is_true():
                 new_context = self.generate_new_context("if statement", context)
-                return self.visit(statement_list, new_context)
-                # if self.error: return
-                # return
+                self.visit(statement_list, new_context)
+                if self.error or self.should_return: return
 
         if node.else_statement_list:
-            return self.visit(node.else_statement_list, context)
-        #     if self.error: return
-        
-        # return res
+            self.visit(node.else_statement_list, context)
 
     # Runs a for loop from a ForNode
     def visit_ForNode(self, node, context):
@@ -192,7 +188,6 @@ class Interpreter:
             condition = self.visit(node.condition_node, condition_context)
             if self.error: return
             
-
 
     # Runs a while loop from a WhileNode
     def visit_WhileNode(self, node, context):
@@ -237,12 +232,21 @@ class Interpreter:
         function = self.visit(node.atom, context)
         if self.error: return
 
+        # Check that atom is a function
+        if not isinstance(function, Function):
+            self.error = RTError(f"{function.value} is not a function", node.start_pos, context)
+            return
+
         if function is None:
-            self.error = RTError(f"Function '{function.name}' is not defined", node.name_token.start_pos)
+            self.error = RTError(f"Function '{function.name}' is not defined", node.name_token.start_pos, context)
             return
 
         # Check for same number of args as defined in function
-        function.check_args(node.args)
+        valid_args, error = function.check_args(node.args)
+        if not valid_args:
+            error.position = node.start_pos
+            self.error = error
+            return
 
         # Add args to new context
         new_context = self.generate_new_context(f'Function: {function.name}()', context)

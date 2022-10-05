@@ -221,20 +221,19 @@ class Function(Value):
         self.statement_list = statement_list
         self.built_in = built_in
 
-    def get_name(self):
-        return self.name
-
     def check_args(self, args_passed):
         num_args_passed = len(args_passed)
         num_args_in_def = len(self.arg_names)
 
         if num_args_passed < num_args_in_def:
-            raise Exception(
-                f'Function {self.name} is missing {num_args_in_def - num_args_passed} argument{"s" if num_args_in_def - num_args_passed > 1 else ""}'
-                )
+            return False, RTError(f'Function {self.name} is missing {num_args_in_def - num_args_passed} argument{"s" if num_args_in_def - num_args_passed > 1 else ""}')
+            # raise Exception(
+            #     f'Function {self.name} is missing {num_args_in_def - num_args_passed} argument{"s" if num_args_in_def - num_args_passed > 1 else ""}'
+            #     )
         elif num_args_passed > num_args_in_def:
-            raise Exception(f'Function {self.name} has {num_args_passed - num_args_in_def} too many arguments')
-        return True
+            return False, RTError(f'Function {self.name} has {num_args_passed - num_args_in_def} too many arguments')
+            # raise Exception(f'Function {self.name} has {num_args_passed - num_args_in_def} too many arguments')
+        return True, None
 
     def execute(self):
         raise Exception(f'{self.name}.execute method is undefined.')

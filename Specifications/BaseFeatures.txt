@@ -1,0 +1,25 @@
+Primitive Data Types:
+    - Number
+    - String
+    - Boolean (represented by numbers 0 and 1)
+
+Variables:
+    Dynamic Types
+    Ex:
+        var my_var = 97
+
+-----------------------
+
+User Defined Types
+    - type <- class name
+    - Cannot make multiple classes with same name
+    - Accessible fields and methods
+
+Python API
+    Ability to link into python code dynamically
+
+Namespaces
+    Grouping for variables, functions, classes
+
+File Imports
+    Import file contents into a namespace

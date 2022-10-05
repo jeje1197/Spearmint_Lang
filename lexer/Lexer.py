@@ -46,7 +46,7 @@ KEYWORDS = [
 ]
 
 class Lexer:
-    def __init__(self, fn, text):
+    def __init__(self, fn=None, text=""):
         self.fn = fn
         self.text = text
         self.index = -1

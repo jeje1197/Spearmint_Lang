@@ -1,3 +1,4 @@
+from token import LBRACE
 from typing import List
 from error.Error import Error, InvalidSyntaxError
 from lexer.Lexer import BREAK, CLASS, CONTINUE, ELSE, FOR, FUNCTION, IF, RETURN, STEP, TO, VAR, WHILE
@@ -28,6 +29,14 @@ class Parser:
             return self.token_list[self.index + steps_ahead]
         else: return None
 
+    def get_next_non_newline(self):
+        idx = self.index
+        while self.token_list[idx].type == Token.NEWLINE:
+            if idx > len(self.token_list): return None
+            idx += 1
+        
+        return self.token_list[idx]
+
     # Returns list_of_statements, error
     def parse(self):
         statement_list = self.statements()
@@ -44,7 +53,6 @@ class Parser:
     # Returns a list of statements
     def statements(self, end_search_at_token_type=Token.EOF) -> List or None:
         statement_list = []
-        start_pos = self.current_token.start_pos
 
         # Skip newlines before
         self.skip_newlines()
@@ -58,10 +66,10 @@ class Parser:
 
             statement = self.statement()
             if self.error: return
-
+            
             # Require newline after main statements if not end of file
             if not self.current_token.type in (Token.NEWLINE, end_search_at_token_type):
-                self.error = InvalidSyntaxError("Expected newline or ';' after statement", statement.start_pos)
+                self.error = InvalidSyntaxError("Expected newline or ';' after statement", self.current_token.start_pos)
                 return
 
             statement_list.append(statement)
@@ -69,74 +77,52 @@ class Parser:
             # Skip newlines
             self.skip_newlines()
         
-        # if len(statement_list) == 0:
-        #     self.error = InvalidSyntaxError('No valid statement found', start_pos)
-        #     return
-
         return statement_list
 
     # Returns a node
     def statement(self):
-        statement = None
 
-        # VarDeclaration
+        # var declaration
         if self.current_token.matches(Token.KEYWORD, VAR):
-            statement = self.var_declaration()
-            if self.error: return
-        
-        # VarAssign or FunctionCall
-        elif self.current_token.type == Token.IDENTIFIER:
-            if self.current_token and self.look_ahead(1).type == Token.LPAREN:
-                statement = self.function_call()
-                if self.error: return
-            elif self.current_token and self.look_ahead(1).type == Token.DOT:
-                statement = self.class_access()
-                if self.error: return
-            else:
-                statement = self.var_assign()
-                if self.error: return
+            return self.var_declaration()
 
+        # var assign
+        elif self.current_token.type == Token.IDENTIFIER and self.look_ahead(1).type == Token.EQ:
+            return self.var_assign()
+        
         # if statement
         elif self.current_token.matches(Token.KEYWORD, IF):
-            statement = self.if_expr()
-            if self.error: return
+            return self.if_statement()
 
         # for statement
         elif self.current_token.matches(Token.KEYWORD, FOR):
-            statement = self.for_expr()
-            if self.error: return
-
+            return self.for_statement()
+        
         # while statement
         elif self.current_token.matches(Token.KEYWORD, WHILE):
-            statement = self.while_expr()
-            if self.error: return
+            return self.while_statement()
 
-        # function def statement
+        # function def
         elif self.current_token.matches(Token.KEYWORD, FUNCTION):
-            statement = self.function_def()
-            if self.error: return
+            return self.function_def()
 
         # return statement
         elif self.current_token.matches(Token.KEYWORD, RETURN):
-            statement = self.return_statement()
-            if self.error: return
+            return self.return_statement()
 
         # break statement
         elif self.current_token.matches(Token.KEYWORD, BREAK):
-            statement = self.break_statement()
-            if self.error: return
+            return self.break_statement()
 
         # continue statement
         elif self.current_token.matches(Token.KEYWORD, CONTINUE):
-            statement = self.continue_statement()
-            if self.error: return
+            return self.continue_statement()
+        
+        # expr
+        expr = self.expr()
+        if self.error: return
 
-        # class Def
-        # elif self.current_token.matches(Token.KEYWORD, CLASS):
-        #     statement = self.class_def()
-        #     if self.error: return
-
-        return statement
+        return expr
 
     def expr(self):
         ops = (Token.AND, Token.OR, Token.BITWISEAND, Token.BITWISEOR)
@@ -165,22 +151,63 @@ class Parser:
         return node
 
     def arith_expr(self):
-        ops = (Token.PLUS, Token.MINUS, Token.MOD)
+        ops = (Token.PLUS, Token.MINUS)
         node = self.bin_op(self.term, ops, self.term)
         if self.error: return
         return node
 
     def term(self):
-        ops = (Token.MUL, Token.DIV)
+        ops = (Token.MUL, Token.DIV, Token.MOD)
         node = self.bin_op(self.power, ops, self.power)
         if self.error: return
         return node
 
     def power(self):
         ops = (Token.POW)
-        node = self.bin_op(self.atom, ops, self.power)
+        node = self.bin_op(self.call, ops, self.power)
         if self.error: return
         return node
+
+    def call(self):
+        atom = self.atom()
+        if self.error: return
+
+        args = []
+        if self.current_token.type == Token.LPAREN:
+            self.get_next()
+            self.skip_newlines()
+
+            # Check for any arguments
+            expr = self.expr()
+            if self.error and self.current_token.type != Token.RPAREN:
+                return
+            else:
+                self.error = None
+            self.skip_newlines()
+
+            # If there is an arguments, check for more
+            if expr:
+                args.append(expr)
+
+                while self.current_token.type == Token.COMMA:
+                    self.get_next()
+
+                    self.skip_newlines()
+
+                    expr = self.expr()
+                    if self.error: return
+
+                    args.append(expr)
+                    self.skip_newlines()
+
+            if self.current_token.type != Token.RPAREN:
+                self.error = InvalidSyntaxError("Expected ')'", self.current_token.start_pos)
+                return
+            end_pos = self.current_token.end_pos
+            self.get_next()
+            return FunctionCallNode(atom, args, end_pos)
+
+        return atom
 
     def atom(self):
         token = self.current_token
@@ -193,11 +220,7 @@ class Parser:
 
         # VarAccess or FunctionCall
         elif self.current_token.type == Token.IDENTIFIER:
-            if self.look_ahead(1).type == Token.LPAREN:
-                statement = self.function_call()
-                if self.error: return
-                node_to_return = statement
-            elif self.look_ahead(1).type == Token.EQ:
+            if self.look_ahead(1).type == Token.EQ:
                 self.error = InvalidSyntaxError(f'Cannot assign variable mid expression',
                     token.start_pos)
                 return
@@ -223,11 +246,7 @@ class Parser:
                 self.error = InvalidSyntaxError(f"Expected ')'", token.start_pos)
                 return
             self.get_next()
-
             node_to_return = expr
-        
-        if not node_to_return:
-            self.error = InvalidSyntaxError('Expected atom', token.start_pos)
 
         return node_to_return
 
@@ -265,8 +284,8 @@ class Parser:
         self.get_next()
         self.skip_newlines()
 
-        if self.current_token.type != Token.COLON:
-            self.error = InvalidSyntaxError("Expected newline, semicolon or ':'", self.current_token.start_pos)
+        if self.current_token.type != Token.EQ:
+            self.error = InvalidSyntaxError("Expected newline, or '='", self.current_token.start_pos)
             return
         self.get_next()
         self.skip_newlines()
@@ -283,7 +302,7 @@ class Parser:
         self.get_next()
         self.skip_newlines()
 
-        if self.current_token.type != Token.COLON:
+        if self.current_token.type != Token.EQ:
             self.error = InvalidSyntaxError("Expected variable assignment ':'", self.current_token.start_pos)
             return
         self.get_next()
@@ -293,7 +312,7 @@ class Parser:
         if self.error: return
         return VarAssignNode(var_name_token, expr)           
 
-    def if_expr(self):
+    def if_statement(self):
         cases = []
 
         #if (condition) {expr}
@@ -392,7 +411,7 @@ class Parser:
 
         return IfNode(cases, else_statement_list)
 
-    def for_expr(self):
+    def for_statement(self):
         if not self.current_token.matches(Token.KEYWORD, FOR):
             self.error = InvalidSyntaxError(f"Expected '{FOR}'", self.current_token.start_pos)
             return
@@ -452,10 +471,11 @@ class Parser:
         return ForNode(init_statement, conditional_expr, update_statement, 
             statement_list, start_pos, end_pos)
 
-    def while_expr(self):
+    def while_statement(self):
         if not self.current_token.matches(Token.KEYWORD, WHILE):
             self.error = InvalidSyntaxError(f"Expected '{WHILE}'", self.current_token.start_pos)
             return
+        start_pos = self.current_token.start_pos
         self.get_next()
         self.skip_newlines()
 
@@ -486,9 +506,10 @@ class Parser:
         if self.current_token.type != Token.RBRACE:
             self.error = InvalidSyntaxError("Expected '}'", self.current_token.start_pos)
             return
+        end_pos = self.current_token.end_pos
         self.get_next()
 
-        return WhileNode(cond_node, statement_list)
+        return WhileNode(cond_node, statement_list, start_pos, end_pos)
 
     def function_def(self):
         arg_names = []
@@ -561,51 +582,6 @@ class Parser:
         self.get_next()
 
         return FunctionDefNode(name_token, arg_names, statement_list ,start_pos)
-        
-    def function_call(self):
-        args = []
-        if self.current_token.type != Token.IDENTIFIER:
-            self.error = InvalidSyntaxError("Expected identifier", self.current_token.start_pos)
-            return
-        name_token = self.current_token
-        self.get_next()
-
-        if self.current_token.type != Token.LPAREN:
-            self.error = InvalidSyntaxError("Expected '('", self.current_token.start_pos)
-            return
-        self.get_next()
-        self.skip_newlines()
-
-        # Check for any arguments
-        expr = self.expr()
-        if self.error and self.current_token.type != Token.RPAREN:
-            return
-        else:
-            self.error = None
-        self.skip_newlines()
-
-        # If there is an arguments, check for more
-        if expr:
-            args.append(expr)
-
-            while self.current_token.type == Token.COMMA:
-                self.get_next()
-
-                self.skip_newlines()
-
-                expr = self.expr()
-                if self.error: return
-
-                args.append(expr)
-                self.skip_newlines()
-
-        if self.current_token.type != Token.RPAREN:
-            self.error = InvalidSyntaxError("Expected ')'", self.current_token.start_pos)
-            return
-        end_pos = self.current_token.end_pos
-        self.get_next()
-
-        return FunctionCallNode(name_token, args, end_pos)
 
     def return_statement(self):
         if not self.current_token.matches(Token.KEYWORD, RETURN):
@@ -616,10 +592,12 @@ class Parser:
         self.get_next()
 
         expr = None
-        if not self.current_token.type in (Token.NEWLINE):
+        if self.current_token.type != Token.NEWLINE:
             expr = self.expr()
             if self.error: return
-
+            if expr: 
+                end_pos = expr.end_pos
+            
         return ReturnNode(expr, start_pos, end_pos)
 
     def break_statement(self):

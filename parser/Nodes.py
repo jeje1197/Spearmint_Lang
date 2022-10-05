@@ -1,3 +1,6 @@
+from tracemalloc import start
+
+
 class UnaryOpNode:
     def __init__(self, op_token, node) -> None:
         self.op_token = op_token
@@ -47,7 +50,7 @@ class VarDeclarationNode:
         self.expr_node = expr_node
 
     def __repr__(self):
-        return f"(VarDeclaration: {self.var_name_token.value}: {self.expr_node}"
+        return f"(VarDeclaration: {self.var_name_token.value}: {self.expr_node})"
 
 class VarAssignNode:
     def __init__(self, var_name_token, value_node) -> None:
@@ -104,12 +107,12 @@ class ForNode:
         return f'for ({self.init_statement}; {self.condition_node}; {self.update_statement}) do {self.statement_list}'
 
 class WhileNode:
-    def __init__(self, condition_node, statement_list):
+    def __init__(self, condition_node, statement_list, start_pos, end_pos):
         self.condition_node = condition_node
         self.statement_list = statement_list
 
-        self.start_pos = self.condition_node.start_pos
-        self.end_pos = self.statement_list[len(statement_list)-1].end_pos
+        self.start_pos = start_pos
+        self.end_pos = end_pos
 
     def __repr__(self):
         return f'while {self.condition_node} then {self.statement_list}'
@@ -127,15 +130,15 @@ class FunctionDefNode:
         return f'FunctionDef: {self.name_token.value}({self.arg_names}) do {self.statement_list}'
 
 class FunctionCallNode:
-    def __init__(self, name_token, args, end_pos=None):
-        self.name_token = name_token
+    def __init__(self, atom, args, end_pos=None):
+        self.atom = atom
         self.args = args
 
-        self.start_pos = self.name_token.start_pos
+        self.start_pos = self.atom.start_pos
         self.end_pos = end_pos
 
     def __repr__(self):
-        return f'FunctionCall: {self.name_token.value}({self.args})'
+        return f'FunctionCall: {self.atom.value}({self.args})'
 
 class ReturnNode:
     def __init__(self, expr_node, start_pos, end_pos):
@@ -145,7 +148,7 @@ class ReturnNode:
         self.end_pos = self.expr_node.end_pos if expr_node else end_pos
 
     def __repr__(self):
-        return f'Return: ({self.expr_node})'
+        return f'Return: {self.expr_node}'
 
 class BreakNode:
     def __init__(self, start_pos, end_pos):

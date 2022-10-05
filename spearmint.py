@@ -3,7 +3,7 @@
 # for input. Input is then passed to the run function.
 
 # Imports
-from run.run import run, run_from_file, run_tests
+from run.run import run, run_from_file
 
 def command_prompt():
     # print("Starting JPL...")
@@ -25,9 +25,6 @@ def command_prompt():
         if '--q' in commands:
             break
 
-        if '--c' in commands:
-            should_transpile = True
-
         # Read directly from file argument with '-r' tag
         if '--r' in commands:
             index = 1
@@ -41,11 +38,9 @@ def command_prompt():
             if not '.jpl' in commands[index]:
                 commands[index] += '.jpl'
 
-            run_from_file(commands[index], should_transpile)
-        elif '--t' in commands:
-            run_tests()
+            run_from_file(commands[index])
         else:
             # Run interpreter/transpiler
-            run("Command Line", user_input, should_transpile)
+            run("Command Line", user_input)
 
 command_prompt()

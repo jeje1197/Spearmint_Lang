@@ -1,7 +1,6 @@
 from error.Error import RTError
 from interpreter.SymbolTable import SymbolTable
 
-
 class Value:
     def __init__(self, value, type):
         self.value = value
@@ -214,8 +213,9 @@ class String(Value):
         return copy
 
 
-class Function:
+class Function(Value):
     def __init__(self, name, arg_names, statement_list, built_in=False) -> None:
+        super().__init__(1, "Function")
         self.name = name
         self.arg_names = arg_names
         self.statement_list = statement_list
@@ -239,8 +239,15 @@ class Function:
     def execute(self):
         raise Exception(f'{self.name}.execute method is undefined.')
 
+    def copy(self):
+        return self
+
+    def __str__(self):
+        return f'<{self.type} Name: "{self.name}", Args: {self.arg_names}, Statements: {self.statement_list}>'
+
     def __repr__(self):
-        return f'(Function Name: "{self.name}", Statements: {self.statement_list})'
+        return self.__str__()
+
 
 class Class(Value):
     def __init__(self, class_name):

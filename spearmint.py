@@ -35,8 +35,8 @@ def command_prompt():
                 print('No file argument found. Enter a file name. Ex: file_name.jpl')
                 continue
 
-            if not '.jpl' in commands[index]:
-                commands[index] += '.jpl'
+            # if not '.spm' in commands[index]:
+            #     commands[index]
 
             run_from_file(commands[index])
         else:

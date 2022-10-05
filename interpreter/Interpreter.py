@@ -47,6 +47,21 @@ class Interpreter:
                 break
         return res_list
 
+    # Performs an operation on one nodes
+    def visit_UnaryOpNode(self, node, context):
+        expr = self.visit(node.expr_node, context)
+
+        result, error = None, None
+        if node.op_token.type == Token.MINUS:
+            result, error = expr.multed_by(Number(-1))
+        elif node.op_token.type == Token.NOT:
+            result, error = expr.notted()
+
+        return result
+
+
+
+
     # Performs an operation between two nodes
     def visit_BinaryOpNode(self, node, context):
         left = self.visit(node.left_node, context)
@@ -83,8 +98,6 @@ class Interpreter:
             result, error = left.anded_by(right)
         elif node.op_token.type == Token.OR:
             result, error = left.ored_by(right)
-        elif node.op_token.type == Token.NOT:
-            result, error = left.notted(right)
 
         if error:
             error.position = node.op_token.start_pos

@@ -2,12 +2,12 @@ from tracemalloc import start
 
 
 class UnaryOpNode:
-    def __init__(self, op_token, node) -> None:
+    def __init__(self, op_token, expr_node) -> None:
         self.op_token = op_token
-        self.node = node
+        self.expr_node = expr_node
 
         self.start_pos = self.op_token.start_pos
-        self.end_pos = self.node.end_pos
+        self.end_pos = self.expr_node.end_pos
 
     def __repr__(self):
         return f'(U: {self.op_token} {self.node})'

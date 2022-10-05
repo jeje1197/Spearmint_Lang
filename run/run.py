@@ -1,6 +1,6 @@
 import os
 
-from interpreter.Classes import Number
+from interpreter.Classes import Boolean
 from interpreter.Context import Context
 from interpreter.Interpreter import Interpreter
 from interpreter.SymbolTable import SymbolTable
@@ -9,11 +9,11 @@ from parser.Parser import Parser
 
 global_symbol_table = SymbolTable()
 global_symbol_table.set_multiple([
-    ("true", Number(1)),
-    ("false", Number(0))
+    ("true", Boolean(1)),
+    ("false", Boolean(0))
 ])
 
-def run(file_name, input_text, compile=False) -> str:
+def run(file_name, input_text) -> str:
 
     # Lexer
     lexer = Lexer(file_name, input_text)
@@ -70,4 +70,4 @@ def run_from_file(file_name, transpile=False):
     file.close()
 
     # Pass in file text as input
-    run(file_name, file_text, transpile)
+    run(file_name, file_text)

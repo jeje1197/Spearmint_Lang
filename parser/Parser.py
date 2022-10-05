@@ -125,24 +125,13 @@ class Parser:
         return expr
 
     def expr(self):
-        ops = (Token.AND, Token.OR, Token.BITWISEAND, Token.BITWISEOR)
+        ops = (Token.AND, Token.OR)
         node = self.bin_op(self.comp_expr, ops, self.comp_expr)
         if self.error: return 
 
         return node
 
     def comp_expr(self):
-        # Check for '!'
-        if self.current_token.type == Token.NOT:
-            op_token = self.current_token
-            self.get_next()
-
-            self.skip_newlines()
-
-            node = self.comp_expr()
-            if self.error: return
-            return UnaryOpNode(op_token, node)
-
         # Check for comparisons
         ops = (Token.EE, Token.NE, Token.LT, Token.GT, Token.LTE, Token.GTE)
         node = self.bin_op(self.arith_expr, ops, self.arith_expr)
@@ -191,7 +180,6 @@ class Parser:
 
                 while self.current_token.type == Token.COMMA:
                     self.get_next()
-
                     self.skip_newlines()
 
                     expr = self.expr()
@@ -213,7 +201,8 @@ class Parser:
         token = self.current_token
         node_to_return = None
 
-        if token.type in (Token.PLUS, Token.MINUS):
+        # Unary OP (+, -, !)
+        if token.type in (Token.PLUS, Token.MINUS, Token.NOT):
             self.get_next()
             atom = self.atom()
             node_to_return = UnaryOpNode(token, atom)
@@ -260,7 +249,6 @@ class Parser:
         while self.current_token.type in ops:
             op_token = self.current_token
             self.get_next()
-
             self.skip_newlines()
 
             right_node = func_b()

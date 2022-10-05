@@ -1,0 +1,11 @@
+class List {
+    var base = []
+
+    fun size() {
+        return len(base)
+    }
+
+    fun add() {
+        if 
+    }
+}

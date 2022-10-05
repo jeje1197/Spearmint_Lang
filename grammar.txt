@@ -8,8 +8,7 @@ statement		: KEYWORD:RETURN expr?
 expr        : KEYWORD:VAR IDENTIFIER EQ expr
             : comp-expr ((KEYWORD:AND|KEYWORD:OR) comp-expr)*
 
-comp-expr   : NOT comp-expr
-            : arith-expr ((EE|LT|GT|LTE|GTE) arith-expr)*
+comp-expr   : arith-expr ((EE|LT|GT|LTE|GTE) arith-expr)*
 
 arith-expr  :	term ((PLUS|MINUS) term)*
 
@@ -23,6 +22,7 @@ power       : call (POW factor)*
 call        : atom (LPAREN (expr (COMMA expr)*)? RPAREN)?
 
 atom        : INT|FLOAT|STRING|IDENTIFIER
+            : Unary PLUS, MINUS, NOT
             : LPAREN expr RPAREN
             : list-expr
             : if-expr

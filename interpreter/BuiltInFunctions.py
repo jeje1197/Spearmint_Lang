@@ -1,4 +1,4 @@
-from interpreter.Classes import Function, String
+from interpreter.Classes import Function, List, String
 
 
 # -------------------- Print method --------------------
@@ -32,7 +32,7 @@ list_args = []
 # Type function implementation
 def execute_create_list(interpreter, context):
     print("called")
-    return list()
+    return List()
 
 list_function = Function('list', list_args, statement_list=None, built_in=True)
 list_function.execute = execute_create_list

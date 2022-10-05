@@ -67,5 +67,4 @@ class RTError(Error):
             pos = ctx.parent_entry_pos
             ctx = ctx.parent
 
-        return f'Traceback (most recent callback):\n{result}' 
-
+        return f'Traceback (most recent callback):\n{result}'

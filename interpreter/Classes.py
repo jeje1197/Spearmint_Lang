@@ -185,6 +185,7 @@ class Number(Value):
         copy = Number(self.value)
         return copy
 
+
 class String(Value):
     def __init__(self, value):
         super().__init__(value, "String")
@@ -209,6 +210,21 @@ class String(Value):
         copy.set_pos(self.start_pos, self.end_pos)
         copy.set_context(self.context)
         return copy
+
+class Boolean(Number):
+    def __init__(self, value=0):
+        super().__init__(value)
+        self.type = "Boolean"
+        self.boolean_value = "true" if self.value else "false"
+
+    def copy(self):
+        return Boolean(self.value)
+
+    def __str__(self):
+        return self.boolean_value
+
+    def __repr__(self):
+        return self.__str__()
 
 
 class Function(Value):
@@ -245,25 +261,34 @@ class Function(Value):
     def __repr__(self):
         return self.__str__()
 
-class Boolean(Number):
-    def __init__(self, value=0):
-        super().__init__(value)
-        self.type = "Boolean"
-        self.boolean_value = "true" if self.value else "false"
-
-    def copy(self):
-        return Boolean(self.value)
-
-    def __str__(self):
-        return self.boolean_value
-
-    def __repr__(self):
-        return self.__str__()
-
 
 class List(Value):
-    def __init__(self, class_name):
-        super().__init__(1,)
+    def __init__(self):
+        super().__init__([], "List")
+
+    def size(self):
+        return Number(len(self.value))
+
+    def add(self, object):
+        self.value.append(object)
+
+    def get(self, index):
+        if (0 <= index and index < len(self.value)):
+            return self.value[index]
+        else:
+            raise Exception(f"Insert index {index} is out of bounds")
+
+    def insert(self, index, object):
+        if (0 <= index and index < len(self.value)):
+            self.value.insert(object)
+        else:
+            raise Exception(f"Insert index {index} is out of bounds")
+
+    def clear(self):
+        self.value.clear()
+
+    def copy(self):
+        return self
 
 class Class(Value):
     def __init__(self, class_name):

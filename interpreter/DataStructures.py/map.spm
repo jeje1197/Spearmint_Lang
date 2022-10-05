@@ -1,5 +1,4 @@
 class Map {
     var value = []
 
-
 }

@@ -43,16 +43,16 @@ def run(file_name, input_text) -> str:
     global_context = Context(file_name)
     global_context.set_symbol_table(global_symbol_table)
 
-    #Interpreter
+    # Interpreter
     interpreter = Interpreter(global_context)
     interpreter.add_BuiltInFunctions()
     output = None
 
-    # try:
-    output = interpreter.visit(statement_list, global_context)
-    # except Exception as e:
-    #     print(e)
-    #     return str(e)
+    try:
+        output = interpreter.visit(statement_list, global_context)
+    except Exception as e:
+        print(e)
+        return str(e)
 
     if interpreter.error:
         print(interpreter.error)
@@ -61,7 +61,7 @@ def run(file_name, input_text) -> str:
         print(output)
         return interpreter.output
 
-def run_from_file(file_name, transpile=False):
+def run_from_file(file_name):
     print(f'----- Reading From File: {file_name} -----')
 
     # Read from file

@@ -117,6 +117,10 @@ class Parser:
         # continue statement
         elif self.current_token.matches(Token.KEYWORD, CONTINUE):
             return self.continue_statement()
+
+        # class def
+        elif self.current_token.matches(Token.KEYWORD, CLASS):
+            return self.class_def()
         
         # expr
         expr = self.expr()
@@ -236,6 +240,21 @@ class Parser:
                 return
             self.get_next()
             node_to_return = expr
+
+        # Object field access 
+        while self.current_token.type == Token.DOT:
+            start_pos = self.current_token.start_pos
+            self.get_next()
+
+            left_node = node_to_return
+            if self.current_token.type != Token.IDENTIFIER:
+                self.error = InvalidSyntaxError("Expected field name after '.'", self.current_token.start_pos)
+                return
+
+            field_token = self.current_token
+            self.get_next()
+
+            node_to_return = ClassAccessNode(left_node, field_token, start_pos, field_token.end_pos)
 
         return node_to_return
 

@@ -168,25 +168,25 @@ class ContinueNode:
 
 class ClassDefNode:
     def __init__(self, class_name_token, property_list, start_pos, end_pos):
-        self.class_name_token = class_name_token
+        self.class_name = class_name_token.value
         self.property_list = property_list
 
         self.start_pos = start_pos
         self.end_pos = end_pos
     
     def __repr__(self):
-        return f"(ClassDef: {self.class_name_token.value} Properties: {self.property_list})"
+        return f"(ClassDef: {self.class_name} Properties: {self.property_list})"
 
 class ClassAccessNode:
-    def __init__(self, class_name_token, property_token, start_pos, end_pos):
-        self.class_name_token = class_name_token
-        self.property_token = property_token
+    def __init__(self, expr_node, field_token, start_pos, end_pos):
+        self.expr_node = expr_node
+        self.field_token = field_token
 
         self.start_pos = start_pos
         self.end_pos = end_pos
     
     def __repr__(self):
-        return f"(ClassAccess: {self.class_name_token.value}.{self.property_token.value})"
+        return f"(ClassAccess: {self.expr_node}.{self.field_token.value})"
 
 # class TypeCastNode:
 #     def __init__(self, type_name_token) -> None:

@@ -261,7 +261,6 @@ class Function(Value):
     def __repr__(self):
         return self.__str__()
 
-
 class List(Value):
     def __init__(self):
         super().__init__([], "List")
@@ -292,29 +291,17 @@ class List(Value):
 
 class Class(Value):
     def __init__(self, class_name):
-        self.class_name = class_name
+        super().__init__(1, class_name)
         self.fields = SymbolTable()
-        self.functions = SymbolTable()
 
     def add_field(self, field_name, value):
         self.fields.set(field_name, value)
-
-    def add_method(self, method_name, value):
-        if self.functions.get(method_name):
-            return self.no_function_redefinition(method_name)
-        self.functions.set(method_name, value)
 
     def access_field(self, field_name):
         field = self.fields.get(field_name)
         if not field:
             return self.no_property_found(field_name)
         return field
-
-    def access_method(self, method_name):
-        method = self.functions.get(method_name)
-        if not method:
-            return self.no_property_found(method_name)
-        return method
 
     def no_function_redefinition(self, property_name):
         raise Exception(f'{property_name} property is already defined in {self.class_name}.')
@@ -323,10 +310,28 @@ class Class(Value):
         raise Exception(f'No {property_name} property defined in {self.class_name}.')
 
     def copy(self):
-        copy = Class(self.class_name)
-        copy.fields = self.fields
-        copy.functions = self.functions
-        return copy
+        # copy = Class(self.class_name)
+        # copy.fields = self.fields
+        # copy.functions = self.functions
+        # return copy
+        return self
 
     def __repr__(self) -> str:
-        return f'(Class Name: "{self.class_name}"\n\tFields: {self.fields}\n\tMethods: {self.functions}\n)' 
+        return f'(Class Name: "{self.type}"\n\tFields: {self.fields}\n)' 
+
+    def create_object(self):
+        return Object(self.type, self.fields.copy())
+
+class Object(Value):
+    def __init__(self, type: str, fields: SymbolTable) -> None:
+        self.type = type
+        self.fields = fields
+
+    def copy(self):
+        return self
+
+    def __str__(self) -> str:
+        return f'<{self.type} Object \n\tFields: {self.fields}\n>' 
+
+    def __repr__(self) -> str:
+        return self.__str__()

@@ -1,0 +1,10 @@
+// Classes need to pass the context to itself for this
+class Test {
+    var name = "test"
+    fun getName() {
+        return "Getting name"
+    }
+}
+
+var testObj = new("Test")
+print(testObj)

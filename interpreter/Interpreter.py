@@ -1,9 +1,11 @@
+from ast import FunctionDef
 from error.Error import RTError
-from interpreter.Classes import Function, Number, String
+from interpreter.Classes import Class, Function, Number, String
 from interpreter.Context import Context
 from interpreter.SymbolTable import SymbolTable
 from lexer.Token import Token
 from interpreter.BuiltInFunctions import built_in_functions
+from parser.Nodes import FunctionDefNode, VarDeclarationNode
 
 class Interpreter:
     def __init__(self, context):
@@ -58,9 +60,6 @@ class Interpreter:
             result, error = expr.notted()
 
         return result
-
-
-
 
     # Performs an operation between two nodes
     def visit_BinaryOpNode(self, node, context):
@@ -298,3 +297,30 @@ class Interpreter:
 
     def visit_ContinueNode(self, node, context):
         self.should_continue = True
+
+    def visit_ClassDefNode(self, node, context):
+        if context.symbol_table.get(node.class_name):
+            raise Exception(f"Class {node.class_name} is already defined")
+
+        class_def = Class(node.class_name)
+        class_context = self.generate_new_context(f"{node.class_name}", context)
+
+        for property in node.property_list:
+            if isinstance(property, VarDeclarationNode):
+                value = self.visit(property.expr_node, class_context)
+                if self.error: return
+
+                class_def.add_field(property.var_name_token.value, value)
+            elif isinstance(property, FunctionDefNode):
+                class_def.add_field(property.name_token.value, Function(
+                    property.name_token.value, 
+                    property.arg_names, 
+                    property.statement_list
+                ))
+            else:
+                raise Exception(f"{type(property)} cannot be used in class definition: {node.class_name}")
+
+        context.symbol_table.set(node.class_name, class_def)
+        # print(context.symbol_table)
+
+        

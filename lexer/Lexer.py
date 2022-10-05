@@ -31,7 +31,7 @@ CONTINUE    = "continue"
 BREAK       = "break"
 
 # Data Types
-VAR         = 'var'
+VAR         = "var"
 
 CLASS       = "class"
 

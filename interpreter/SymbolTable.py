@@ -44,5 +44,10 @@ class SymbolTable:
     def remove(self, name):
         del self.symbols[name]
 
+    def copy(self):
+        copy = SymbolTable(self.parent)
+        copy.symbols = self.symbols.copy()
+        return copy
+
     def __repr__(self) -> str:
         return str(self.symbols)

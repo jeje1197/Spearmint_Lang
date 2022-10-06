@@ -321,6 +321,15 @@ class Interpreter:
                 raise Exception(f"{type(property)} cannot be used in class definition: {node.class_name}")
 
         context.symbol_table.set(node.class_name, class_def)
-        # print(context.symbol_table)
 
+    def visit_ClassAccessNode(self, node, context):
+        left = self.visit(node.expr_node, context)
+        if self.error: return
+
+        field = left.fields.get(node.field_name)
+        if field is None:
+            self.error = RTError(f"{left} does not have a '{node.field_name}' field", node.start_pos, context)
+            return 
+        
+        return field
         

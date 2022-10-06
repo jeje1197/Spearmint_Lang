@@ -8,3 +8,4 @@ class Test {
 
 var testObj = new("Test")
 print(testObj)
+print(testObj.name)

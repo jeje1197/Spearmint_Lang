@@ -30,13 +30,12 @@ new_obj_args = ['class_name']
 
 # Object Instantiator
 def execute_create_new_obj(interpreter, context):
-    obj_type = context.symbol_table.get('class_name').value
-    class_def = context.symbol_table.get(obj_type)
+    class_name_token = context.symbol_table.get('class_name')
+    class_def = context.symbol_table.get(class_name_token.value)
     if not isinstance(class_def, Class):
-        print(type(class_def))
-        raise Exception(f"Expected class name as argument")
+        raise Exception(f"Expected class name as argument. Received '{class_name_token.value}'")
 
-    return class_def.create_object()
+    return class_def.create_object().set_context(context).set_pos(class_name_token.start_pos, class_name_token.end_pos)
 
 create_new_obj_function = Function('new', new_obj_args, statement_list=None, built_in=True)
 create_new_obj_function.execute = execute_create_new_obj

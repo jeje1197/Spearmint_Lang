@@ -38,9 +38,15 @@ class Value:
         return None, self.illegal_operation(other)
 
     def get_comparison_eq(self, other):
+        if self.type == other.type:
+            return Boolean(id(self) == id(other)).set_context(self.context).set_pos(self.start_pos, self.end_pos), None
+
         return None, self.illegal_operation(other)
     
     def get_comparison_ne(self, other):
+        if self.type == other.type:
+            return Boolean(id(self) != id(other)).set_context(self.context).set_pos(self.start_pos, self.end_pos), None
+        
         return None, self.illegal_operation(other)
 
     def get_comparison_lt(self, other):
@@ -79,7 +85,7 @@ class Value:
     def illegal_operation(self, other=None):
         if not other: 
             other = self
-        return RTError(f'Illegal operation on {self.type}', other.start_pos, self.context)
+        return RTError(f'Illegal operation on {self.type}', self.start_pos, self.context)
 
 
 class Number(Value):
@@ -316,8 +322,11 @@ class Class(Value):
         # return copy
         return self
 
-    def __repr__(self) -> str:
+    def __str__(self) -> str:
         return f'(Class Name: "{self.type}"\n\tFields: {self.fields}\n)' 
+
+    def __repr__(self) -> str:
+        return self.__str__() 
 
     def create_object(self):
         return Object(self.type, self.fields.copy())

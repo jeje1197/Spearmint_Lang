@@ -197,7 +197,56 @@ class Parser:
                 return
             end_pos = self.current_token.end_pos
             self.get_next()
-            return FunctionCallNode(atom, args, end_pos)
+            atom = FunctionCallNode(atom, args, end_pos)
+
+        # Object field access 
+        while self.current_token.type == Token.DOT:
+            start_pos = self.current_token.start_pos
+            self.get_next()
+
+            left_node = atom
+            if self.current_token.type != Token.IDENTIFIER:
+                self.error = InvalidSyntaxError("Expected field name after '.'", self.current_token.start_pos)
+                return
+
+            field_token = self.current_token
+            self.get_next()
+
+            atom = ClassAccessNode(left_node, field_token, start_pos, field_token.end_pos)
+
+            args = []
+            if self.current_token.type == Token.LPAREN:
+                self.get_next()
+                self.skip_newlines()
+
+                # Check for any arguments
+                expr = self.expr()
+                if self.error and self.current_token.type != Token.RPAREN:
+                    return
+                else:
+                    self.error = None
+                self.skip_newlines()
+
+                # If there is an arguments, check for more
+                if expr:
+                    args.append(expr)
+
+                    while self.current_token.type == Token.COMMA:
+                        self.get_next()
+                        self.skip_newlines()
+
+                        expr = self.expr()
+                        if self.error: return
+
+                        args.append(expr)
+                        self.skip_newlines()
+
+                if self.current_token.type != Token.RPAREN:
+                    self.error = InvalidSyntaxError("Expected ')'", self.current_token.start_pos)
+                    return
+                end_pos = self.current_token.end_pos
+                self.get_next()
+                atom = FunctionCallNode(atom, args, end_pos)
 
         return atom
 
@@ -240,21 +289,6 @@ class Parser:
                 return
             self.get_next()
             node_to_return = expr
-
-        # Object field access 
-        while self.current_token.type == Token.DOT:
-            start_pos = self.current_token.start_pos
-            self.get_next()
-
-            left_node = node_to_return
-            if self.current_token.type != Token.IDENTIFIER:
-                self.error = InvalidSyntaxError("Expected field name after '.'", self.current_token.start_pos)
-                return
-
-            field_token = self.current_token
-            self.get_next()
-
-            node_to_return = ClassAccessNode(left_node, field_token, start_pos, field_token.end_pos)
 
         return node_to_return
 

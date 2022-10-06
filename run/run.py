@@ -8,10 +8,6 @@ from lexer.Lexer import Lexer
 from parser.Parser import Parser
 
 global_symbol_table = SymbolTable()
-global_symbol_table.set_multiple([
-    ("true", Boolean(1)),
-    ("false", Boolean(0))
-])
 
 def run(file_name, input_text) -> str:
 
@@ -41,6 +37,10 @@ def run(file_name, input_text) -> str:
 
     # Set context
     global_context = Context(file_name)
+    global_symbol_table.set_multiple([
+        ("true", Boolean(1)),
+        ("false", Boolean(0))
+    ])
     global_context.set_symbol_table(global_symbol_table)
 
     # Interpreter
@@ -58,7 +58,7 @@ def run(file_name, input_text) -> str:
         print(interpreter.error)
         return str(interpreter.error)
     else:
-        print(output)
+        # print(output)
         return interpreter.output
 
 def run_from_file(file_name):

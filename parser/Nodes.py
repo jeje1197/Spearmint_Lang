@@ -180,7 +180,7 @@ class ClassDefNode:
 class ClassAccessNode:
     def __init__(self, expr_node, field_token, start_pos, end_pos):
         self.expr_node = expr_node
-        self.field_token = field_token
+        self.field_name = field_token.value
 
         self.start_pos = start_pos
         self.end_pos = end_pos

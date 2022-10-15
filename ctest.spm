@@ -1,11 +1,33 @@
 // Classes need to pass the context to itself for this
 class Test {
     var name = "test"
-    fun getName() {
+    fun testFunction() {
         return "Getting name"
+    }
+
+    fun testGetter(this) {
+        return this.name
+    }
+
+    fun repr(this) {
+        return this.name + "\n"
     }
 }
 
+// Instantiate Object
 var testObj = new("Test")
+//var testObj2 = testObj
+//var testObj3 = new("Test")
+
+// Print object
 print(testObj)
-print(testObj.name)
+
+// Print object fields
+print("Object field test: " + "'" + testObj.name + "'")
+print("Object function test: " + "'" + testObj.testFunction() + "'")
+print(testObj.testGetter(testObj))
+//print("Object function 'this' keyword test: " + "'" + testObj.testGetter() + "'")
+
+// Check that objects are passed by reference
+//print("Are the objects equal: " + (testObj == testObj2))
+//print("Are the objects equal: " + (testObj == testObj3))

@@ -35,7 +35,8 @@ def execute_create_new_obj(interpreter, context):
     if not isinstance(class_def, Class):
         raise Exception(f"Expected class name as argument. Received '{class_name_token.value}'")
 
-    return class_def.create_object().set_context(context).set_pos(class_name_token.start_pos, class_name_token.end_pos)
+    obj = class_def.create_object().set_context(context).set_pos(class_name_token.start_pos, class_name_token.end_pos)
+    return obj
 
 create_new_obj_function = Function('new', new_obj_args, statement_list=None, built_in=True)
 create_new_obj_function.execute = execute_create_new_obj

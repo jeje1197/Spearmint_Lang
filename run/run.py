@@ -30,10 +30,10 @@ def run(file_name, input_text) -> str:
         print(error)
         return str(error)
     # else:
-    #     print(f'----- Statements: {len(statement_list)} -----')
-    #     for statement in statement_list:
-    #         print(statement)
-    #     print('----------')
+        # print(f'----- Statements: {len(statement_list)} -----')
+        # for statement in statement_list:
+        #     print(statement)
+        # print('----------')
 
     # Set context
     global_context = Context(file_name)

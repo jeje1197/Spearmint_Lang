@@ -335,6 +335,7 @@ class Object(Value):
     def __init__(self, type: str, fields: SymbolTable) -> None:
         self.type = type
         self.fields = fields
+        self.fields.set('this', self)
 
     def copy(self):
         return self

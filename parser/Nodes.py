@@ -138,7 +138,7 @@ class FunctionCallNode:
         self.end_pos = end_pos
 
     def __repr__(self):
-        return f'FunctionCall: {self.atom.value}({self.args})'
+        return f'FunctionCall: {self.atom}({self.args})'
 
 class ReturnNode:
     def __init__(self, expr_node, start_pos, end_pos):
@@ -186,7 +186,7 @@ class ClassAccessNode:
         self.end_pos = end_pos
     
     def __repr__(self):
-        return f"(ClassAccess: {self.expr_node}.{self.field_token.value})"
+        return f"(ClassAccess: {self.expr_node}.{self.field_name})"
 
 # class TypeCastNode:
 #     def __init__(self, type_name_token) -> None:

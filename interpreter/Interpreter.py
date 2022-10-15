@@ -44,14 +44,17 @@ class Interpreter:
         res_list = []
         for node in statement_list:
             res = self.visit(node, context)
+            if self.error: return
+
             res_list.append(res)
-            if self.should_return or self.should_break or self.should_continue or self.error: 
+            if self.should_return or self.should_break or self.should_continue: 
                 break
         return res_list
 
     # Performs an operation on one nodes
     def visit_UnaryOpNode(self, node, context):
         expr = self.visit(node.expr_node, context)
+        if self.error: return
 
         result, error = None, None
         if node.op_token.type == Token.MINUS:
@@ -59,6 +62,9 @@ class Interpreter:
         elif node.op_token.type == Token.NOT:
             result, error = expr.notted()
 
+        if error:
+            self.error = error
+            return
         return result
 
     # Performs an operation between two nodes
@@ -150,6 +156,7 @@ class Interpreter:
         elif self.function_symbol_table.get(var_name):
             value = self.function_symbol_table.get(var_name)
         else:
+            print("here")
             self.error = RTError(f"{var_name} is undefined", node.start_pos, context)
             return
         return value.copy().set_context(context)
@@ -249,10 +256,6 @@ class Interpreter:
             self.error = RTError(f"{function.value} is not a function", node.start_pos, context)
             return
 
-        if function is None:
-            self.error = RTError(f"Function '{function.name}' is not defined", node.name_token.start_pos, context)
-            return
-
         # Check for same number of args as defined in function
         valid_args, error = function.check_args(node.args)
         if not valid_args:
@@ -327,6 +330,7 @@ class Interpreter:
         if self.error: return
 
         field = left.fields.get(node.field_name)
+
         if field is None:
             self.error = RTError(f"{left} does not have a '{node.field_name}' field", node.start_pos, context)
             return 
